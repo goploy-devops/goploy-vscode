@@ -2,25 +2,41 @@ import * as vscode from 'vscode';
 import axios from 'axios';
 import * as sidebar from './src/sidebar';
 import {
-  DeployPreviewList
+  DeployPreviewList,
+  DeployPublish,
+  DeployProgress,
 } from './src/api/deploy';
 const opc = vscode.window.createOutputChannel('Goploy'); // 可以有多个OutputChannel共存，使用参数名区分
 
 export async function activate(context: vscode.ExtensionContext) {
-  // const config = vscode.workspace.getConfiguration('goploy');
-  // const apiKey = config.get('apiKey');
-  // if (!apiKey) {
-  //   const userInput = await vscode.window.showInputBox({
-  //     prompt: 'Enter your api key',
-  //     placeHolder: 'your can find it in the goploy user center'
-  //   });
-  //   if (userInput) {
-  //     await config.update('apiKey', userInput, vscode.ConfigurationTarget.Global);
-  //   } else {
-  //     vscode.window.showWarningMessage('Please configure goploy.apikey to use this extension.');
-  //     return;
-  //   }
-  // }
+  const config = vscode.workspace.getConfiguration('goploy');
+  const apiKey = config.get('apiKey');
+  if (!apiKey) {
+    const userInput = await vscode.window.showInputBox({
+      prompt: 'Enter your api key',
+      placeHolder: 'your can find it in the goploy user center'
+    });
+    if (userInput) {
+      await config.update('apiKey', userInput, vscode.ConfigurationTarget.Global);
+    } else {
+      vscode.window.showWarningMessage('Please configure goploy.apikey to use this extension.');
+      return;
+    }
+  }
+
+  const domain = config.get('domain');
+  if (!domain) {
+    const userInput = await vscode.window.showInputBox({
+      prompt: 'Enter your goploy domain',
+      placeHolder: 'https://example.com'
+    });
+    if (userInput) {
+      await config.update('domain', userInput, vscode.ConfigurationTarget.Global);
+    } else {
+      vscode.window.showWarningMessage('Please configure goploy.apikey to use this extension.');
+      return;
+    }
+  }
 
   //注册侧边栏面板的实现
   const treeProvider = new sidebar.TreeDataProvider();
@@ -45,7 +61,7 @@ async function resultEntry({ id, label }: { id: string, label: string }) {
   await new DeployPreviewList(
     {
       projectId: Number(projectId),
-      page : 1,
+      page: 1,
       rows: 10,
       state: -1
     }, Number(namespaceId)
@@ -70,34 +86,50 @@ async function resultEntry({ id, label }: { id: string, label: string }) {
     });
 }
 
-let deployingProjects = {};
+let deployingProjects: Record<string, string> = {};
 async function runEntry({ id, label }: { id: string, label: string }) {
-  const config = vscode.workspace.getConfiguration('goploy');
-  const apiKey = config.get('apiKey');
-  const domain = config.get('domain');
   const [namespaceId, projectId] = id.split("-");
-  await axios.post(`${domain}/deploy/publish?X-API-KEY=${apiKey}&G-N-ID=${namespaceId}`, { projectId: projectId });
+  if (deployingProjects[projectId]) {
+    vscode.window.showWarningMessage('Wait for the previous task to finish');
+    return;
+  }
+  deployingProjects[projectId] = await new DeployPublish(
+    {
+      projectId: Number(projectId)
+    }, Number(namespaceId)
+  )
+    .request()
+    .then((response) => response.data.token);
   await vscode.window.withProgress({
     location: vscode.ProgressLocation.Notification,
-    title: `Pushing ${label}`
+    title: `Publishing ${label}`
   }, (progress) => {
 
     return new Promise<void>((resolve) => {
-      const totalSteps = 10;
-      let currentStep = 0;
-
-      const timer = setInterval(() => {
-        if (currentStep >= totalSteps) {
+      const timer = setInterval(async () => {
+        const data = await new DeployProgress(
+          {
+            lastPublishToken: deployingProjects[projectId]
+          }, Number(namespaceId)
+        )
+          .request()
+          .then((response) => response.data);
+        if (data.state === 1) {
+          progress.report({ message: data.stage });
+        } else if (data.state === 0) {
           clearInterval(timer);
           resolve();
+          vscode.window.showErrorMessage(data.message);
+          delete deployingProjects[projectId];
+          return;
+        } else {
+          clearInterval(timer);
+          resolve();
+          vscode.window.showInformationMessage(`Publish ${label} completed successfully`);
+          delete deployingProjects[projectId];
           return;
         }
-
-        progress.report({ message: `Step ${currentStep + 1} of ${totalSteps}`, increment: 10 });
-        currentStep++;
       }, 1000);
     });
   });
-
-  vscode.window.showInformationMessage('Task completed!');
 }

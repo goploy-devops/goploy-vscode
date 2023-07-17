@@ -1,4 +1,4 @@
-import axios, { AxiosResponse, AxiosRequestConfig, AxiosError } from 'axios';
+import axios, { AxiosResponse, AxiosError } from 'axios';
 import * as vscode from 'vscode';
 // create an axios instance
 const service = axios.create({
@@ -24,7 +24,6 @@ service.interceptors.request.use(
   },
   (error: AxiosError) => {
     // do something with request error
-    console.log(error); // for debug
     return Promise.reject(error);
   }
 );

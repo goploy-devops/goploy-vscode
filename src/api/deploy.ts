@@ -64,3 +64,40 @@ export class DeployPreviewList extends Request {
     this.param = { ...param };
   }
 }
+
+export class DeployProgress extends Request {
+  readonly url = '/deploy/getPublishProgress';
+  readonly method = 'get';
+  public param: {
+    lastPublishToken: string
+  };
+  public declare datagram: {
+    state: number
+    stage: string
+    message: string
+  };
+  constructor(param: DeployProgress['param'], namespaceId: number) {
+    super();
+    this.param = param;
+    this.namespaceId = namespaceId;
+  }
+}
+
+
+export class DeployPublish extends Request {
+  readonly url = '/deploy/publish';
+  readonly method = 'post';
+  public param: {
+    projectId: number
+  };
+
+  public declare datagram: {
+    token: string
+  };
+
+  constructor(param: DeployPublish['param'], namespaceId: number) {
+    super();
+    this.param = param;
+    this.namespaceId = namespaceId;
+  }
+}
