@@ -25,7 +25,7 @@
         "goploy.domain": {
           "type": "string",
           "default": "",
-          "description": "goploy domain like schema://domain"
+          "description": "goploy domain like https://example.com"
         }
       }
     },
@@ -34,7 +34,7 @@
         {
           "id": "goploy",
           "title": "Goploy",
-          "icon": "./src/logo/goploy.svg"
+          "icon": "./src/logo/logo.svg"
         }
       ]
     },
@@ -57,14 +57,29 @@
         "icon": "$(refresh)"
       },
       {
-        "command": "namespace.resultEntry",
-        "title": "Result",
-        "icon": "$(note)"
-      },
-      {
         "command": "namespace.runEntry",
         "title": "Run",
         "icon": "$(run)"
+      },
+      {
+        "command": "namespace.branchEntry",
+        "title": "Branch",
+        "icon": "$(git-branch)"
+      },
+      {
+        "command": "namespace.tagEntry",
+        "title": "Tag",
+        "icon": "$(tag)"
+      },
+      {
+        "command": "namespace.rebuildEntry",
+        "title": "Revert to",
+        "icon": "$(notebook-revert)"
+      },
+      {
+        "command": "namespace.resultEntry",
+        "title": "Result",
+        "icon": "$(note)"
       }
     ],
     "menus": {
@@ -85,9 +100,24 @@
           "group": "inline@1"
         },
         {
-          "command": "namespace.resultEntry",
+          "command": "namespace.branchEntry",
           "when": "view == namespace && viewItem == namespaceProjectItem",
           "group": "inline@2"
+        },
+        {
+          "command": "namespace.tagEntry",
+          "when": "view == namespace && viewItem == namespaceProjectItem",
+          "group": "inline@3"
+        },
+        {
+          "command": "namespace.rebuildEntry",
+          "when": "view == namespace && viewItem == namespaceProjectItem",
+          "group": "inline@4"
+        },
+        {
+          "command": "namespace.resultEntry",
+          "when": "view == namespace && viewItem == namespaceProjectItem",
+          "group": "inline@5"
         }
       ]
     }

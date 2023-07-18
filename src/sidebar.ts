@@ -17,7 +17,6 @@ export class TreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem
     private _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | undefined | void> = new vscode.EventEmitter<vscode.TreeItem | undefined | void>();
     readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
     refresh(): void {
-        console.log("refreshing");
         this._onDidChangeTreeData.fire();
     }
     getTreeItem(element: vscode.TreeItem): vscode.TreeItem | Thenable<vscode.TreeItem> {

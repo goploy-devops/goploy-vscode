@@ -31,21 +31,14 @@ export interface PublishTraceExt {
 export class DeployList extends Request {
   readonly url = '/deploy/getList';
   readonly method = 'get';
-  public namespaceId: number;
   public declare datagram: {
     list: ProjectData[]
   };
-
-  constructor(namespaceId: number) {
-    super();
-    this.namespaceId = namespaceId;
-  }
 }
 
 export class DeployPreviewList extends Request {
   readonly url = '/deploy/getPreview';
   readonly method = 'get';
-  public namespaceId: number;
   public param: {
     projectId: number
     state: number
@@ -59,8 +52,7 @@ export class DeployPreviewList extends Request {
   };
 
   constructor(param: DeployPreviewList['param'], namespaceId: number) {
-    super();
-    this.namespaceId = namespaceId;
+    super(namespaceId);
     this.param = { ...param };
   }
 }
@@ -77,18 +69,18 @@ export class DeployProgress extends Request {
     message: string
   };
   constructor(param: DeployProgress['param'], namespaceId: number) {
-    super();
+    super(namespaceId);
     this.param = param;
-    this.namespaceId = namespaceId;
   }
 }
-
 
 export class DeployPublish extends Request {
   readonly url = '/deploy/publish';
   readonly method = 'post';
   public param: {
     projectId: number
+    branch: string
+    commit: string
   };
 
   public declare datagram: {
@@ -96,8 +88,24 @@ export class DeployPublish extends Request {
   };
 
   constructor(param: DeployPublish['param'], namespaceId: number) {
-    super();
+    super(namespaceId);
     this.param = param;
-    this.namespaceId = namespaceId;
+  }
+}
+
+export class DeployRebuild extends Request {
+  readonly url = '/deploy/rebuild';
+  readonly method = 'post';
+  public param: {
+    projectId: number
+    token: string
+  };
+  public declare datagram: {
+    type: string
+    token: string
+  };
+  constructor(param: DeployRebuild['param'], namespaceId: number) {
+    super(namespaceId);
+    this.param = param;
   }
 }

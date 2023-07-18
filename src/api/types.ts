@@ -25,9 +25,13 @@ export abstract class Request {
   abstract url: string;
   abstract method: Method;
   public timeout = 5000;
-  public namespaceId!: number;
+  public namespaceId: number;
   public param!: ID | Record<string, unknown>;
   public datagram!: any;
+
+  constructor(namespaceId: number) {
+    this.namespaceId = namespaceId;
+  }
 
   public request(): Promise<HttpResponse<this['datagram']>> {
     const vsConfig = vscode.workspace.getConfiguration('goploy');

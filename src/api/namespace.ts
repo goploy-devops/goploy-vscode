@@ -19,4 +19,8 @@ export class NamespaceOption extends Request {
   public declare datagram: {
     list: NamespaceUserData[]
   };
+
+  constructor() {
+    super(0);
+  }
 }
