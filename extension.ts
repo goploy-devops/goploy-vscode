@@ -27,7 +27,6 @@ export async function activate(context: vscode.ExtensionContext) {
       await config.update('apiKey', userInput, vscode.ConfigurationTarget.Global);
     } else {
       vscode.window.showWarningMessage('Please configure goploy.apikey to use this extension.');
-      return;
     }
   }
 
@@ -41,7 +40,6 @@ export async function activate(context: vscode.ExtensionContext) {
       await config.update('domain', userInput, vscode.ConfigurationTarget.Global);
     } else {
       vscode.window.showWarningMessage('Please configure goploy.apikey to use this extension.');
-      return;
     }
   }
 
@@ -51,9 +49,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(vscode.commands.registerCommand('extension.openSettings', () => {
     vscode.commands.executeCommand('workbench.action.openSettings', 'goploy');
-  }));
-  context.subscriptions.push(vscode.commands.registerCommand("sidebar_test_id1.openChild", args => {
-    opc.show(); // 打开控制台并切换到OutputChannel tab
   }));
   context.subscriptions.push(vscode.commands.registerCommand("namespace.refreshEntry", () => treeProvider.refresh()));
   context.subscriptions.push(vscode.commands.registerCommand("namespace.runEntry", runEntry));

@@ -35,9 +35,10 @@ export abstract class Request {
 
   public request(): Promise<HttpResponse<this['datagram']>> {
     const vsConfig = vscode.workspace.getConfiguration('goploy');
-    const domain = vsConfig.get('domain');
+    const domain = vsConfig.get<string>('domain');
     const config: AxiosRequestConfig = {
-      url: domain + this.url + `?G-N-ID=${this.namespaceId}`,
+      url: this.url + `?G-N-ID=${this.namespaceId}`,
+      baseURL: domain,
       method: this.method,
       timeout: this.timeout,
     };

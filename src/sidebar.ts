@@ -33,11 +33,6 @@ export class TreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem
                         const label = item.name;
                         const collapsibleState = vscode.TreeItemCollapsibleState.None;
                         const treeNode = new NamespaceProjectItem(label, collapsibleState);
-                        treeNode.command = {
-                            command: "sidebar_test_id1.openChild", //命令id
-                            title: "",
-                            arguments: [id] //命令接收的参数
-                        };
                         treeNode.id = `${element.id}-${id}`;
                         return treeNode;
                     });
