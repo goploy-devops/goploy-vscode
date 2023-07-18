@@ -5,6 +5,9 @@
   "displayName": "Goploy",
   "description": "Publish project",
   "version": "1.0.0",
+  "sponsor": {
+    "url": "https://github.com/zhenorzz/goploy"
+  },
   "engines": {
     "vscode": "^1.64.0"
   },
