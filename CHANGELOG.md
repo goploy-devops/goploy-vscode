@@ -2,8 +2,9 @@
 
 All notable changes to the "goploy" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+## [1.0.0] - 2023-07-18
 
-## [Unreleased]
+### Added
 
-- Initial release
+- Publish project
