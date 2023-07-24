@@ -18,6 +18,8 @@ Goploy is commonly used for:
 
 ## Extension Settings
 
+![Setting](./setting.png)
+
 This extension contributes the following settings:
 
 * `goploy.apiKey`: goploy api key
