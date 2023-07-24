@@ -18,29 +18,10 @@ const opc = vscode.window.createOutputChannel('Goploy'); // 可以有多个Outpu
 export async function activate(context: vscode.ExtensionContext) {
   const config = vscode.workspace.getConfiguration('goploy');
   const apiKey = config.get('apiKey');
-  if (!apiKey) {
-    const userInput = await vscode.window.showInputBox({
-      prompt: 'Enter your api key',
-      placeHolder: 'your can find it in the goploy user center'
-    });
-    if (userInput) {
-      await config.update('apiKey', userInput, vscode.ConfigurationTarget.Global);
-    } else {
-      vscode.window.showWarningMessage('Please configure goploy.apikey to use this extension.');
-    }
-  }
-
   const domain = config.get('domain');
-  if (!domain) {
-    const userInput = await vscode.window.showInputBox({
-      prompt: 'Enter your goploy domain',
-      placeHolder: 'https://example.com'
-    });
-    if (userInput) {
-      await config.update('domain', userInput, vscode.ConfigurationTarget.Global);
-    } else {
-      vscode.window.showWarningMessage('Please configure goploy.apikey to use this extension.');
-    }
+
+  if (!apiKey || !domain) {
+    vscode.commands.executeCommand('workbench.action.openSettings', 'goploy');
   }
 
   //注册侧边栏面板的实现
@@ -50,7 +31,17 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(vscode.commands.registerCommand('extension.openSettings', () => {
     vscode.commands.executeCommand('workbench.action.openSettings', 'goploy');
   }));
-  context.subscriptions.push(vscode.commands.registerCommand("namespace.refreshEntry", () => treeProvider.refresh()));
+  context.subscriptions.push(vscode.commands.registerCommand("namespace.refreshEntry", () => {
+    const config = vscode.workspace.getConfiguration('goploy');
+    const apiKey = config.get('apiKey');
+    const domain = config.get('domain');
+
+    if (!apiKey || !domain) {
+      vscode.commands.executeCommand('workbench.action.openSettings', 'goploy');
+    } else {
+      treeProvider.refresh();
+    }
+  }));
   context.subscriptions.push(vscode.commands.registerCommand("namespace.runEntry", runEntry));
   context.subscriptions.push(vscode.commands.registerCommand("namespace.branchEntry", branchEntry));
   context.subscriptions.push(vscode.commands.registerCommand("namespace.tagEntry", tagEntry));
@@ -59,6 +50,7 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() { }
+
 
 async function branchEntry({ id, label }: { id: string, label: string }) {
   const [namespaceId, projectId] = id.split("-");
