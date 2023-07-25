@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import axios from 'axios';
 import * as sidebar from './src/sidebar';
 import {
   DeployPreviewList,
@@ -77,7 +76,7 @@ async function branchEntry({ id, label }: { id: string, label: string }) {
     });
 
     if (selectedCommit) {
-      await runEntry({ id, label, branch: selectedBranch, commit: selectedCommit.label });
+      await runEntry({ id, label, branch: selectedBranch, commit: selectedCommit.label});
     }
   }
 }
@@ -111,7 +110,23 @@ async function tagEntry({ id, label }: { id: string, label: string }) {
 
 
 let deployingProjects: Record<string, string> = {};
-async function runEntry({ id, label, branch, commit }: { id: string, label: string, branch: string, commit: string }) {
+async function runEntry({ id, label, branch, commit, description }: { id: string, label: string, branch: string, commit: string, description?: string }) {
+  if (description === sidebar.env[1]) {
+    const configuration = vscode.workspace.getConfiguration('window');
+    const oldValue = configuration.get('dialogStyle');
+    if (oldValue !== 'custom') {
+      await configuration.update('dialogStyle', 'custom', vscode.ConfigurationTarget.Global);
+    }
+    const result = await vscode.window.showInformationMessage(`Publish ${label} - ${description}?`, { modal: true }, { title: 'OK' });
+    if (oldValue !== 'custom') {
+      await configuration.update('dialogStyle', oldValue, vscode.ConfigurationTarget.Global);
+    }
+  
+    if (result?.title !== 'OK') {
+      return;
+    }
+  }
+  
   const [namespaceId, projectId] = id.split("-");
   if (deployingProjects[projectId]) {
     vscode.window.showWarningMessage('Wait for the previous task to finish');

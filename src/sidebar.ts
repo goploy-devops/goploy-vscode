@@ -1,6 +1,14 @@
 import * as vscode from 'vscode';
 import { NamespaceOption } from './api/namespace';
 import { DeployList } from './api/deploy';
+    
+export const env = [
+    "Unknown",
+    "Production",
+    "Pre-release",
+    "Test",
+    "Development"
+];
 // 树节点
 export class NamespaceItem extends vscode.TreeItem {
     contextValue = 'namespaceItem';
@@ -10,7 +18,6 @@ export class NamespaceItem extends vscode.TreeItem {
 export class NamespaceProjectItem extends vscode.TreeItem {
     contextValue = 'namespaceProjectItem';
 }
-
 //树的内容组织管理
 export class TreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem>
 {
@@ -34,6 +41,8 @@ export class TreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem
                         const collapsibleState = vscode.TreeItemCollapsibleState.None;
                         const treeNode = new NamespaceProjectItem(label, collapsibleState);
                         treeNode.id = `${element.id}-${id}`;
+                        treeNode.description = env[item.environment];
+                        treeNode.iconPath = new vscode.ThemeIcon("symbol-constructor");
                         return treeNode;
                     });
                     resolve(treeNodes);
@@ -52,6 +61,7 @@ export class TreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem
                         const collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
                         const treeNode = new NamespaceItem(label, collapsibleState);
                         treeNode.id = id.toString();
+                        treeNode.iconPath = new vscode.ThemeIcon("symbol-class");
                         return treeNode;
                     });
                     resolve(treeNodes);
